@@ -15,6 +15,10 @@ const SVC = [
 ];
 const jump = (id) => (e) => { e.preventDefault(); const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: "smooth" }); };
 const PIN = <><path d="M12 21s-7-6.2-7-11.5a7 7 0 0114 0C19 14.8 12 21 12 21z" /><circle cx="12" cy="9.5" r="2.5" /></>;
+const IG = <><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><path d="M17.5 6.5h.01" /></>;
+const FB = <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z" />;
+// ВАЖНО: тук сложи линковете към твоите профили
+const SOCIAL = { ig: "https://www.instagram.com/mkeysplovdiv/", fb: "https://www.facebook.com/profile.php?id=61584523064187" };
 const PH = <path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2z" />;
 const Ic = ({ children }) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">{children}</svg>
@@ -93,24 +97,59 @@ function Card({ x, onDelete, onOpen }) {
   );
 }
 
-function Nav({ page }) {
+function Social() {
   return (
-    <nav><div className="wrap navgrid">
-      <div className="navl">
-        {page === "h" ? <>
-          <a className="navlink on" href="#/">Начало</a>
-          <a className="navlink" href="#uslugi" onClick={jump("uslugi")}>Услуги</a>
-          <a className="navlink" href="#raboti" onClick={jump("raboti")}>Работи</a>
-        </> : <a className="navlink on" href="#/">← Начало</a>}
+    <div className="social">
+      <a className="soc" href={SOCIAL.ig} target="_blank" rel="noopener noreferrer" aria-label="Instagram"><Ic>{IG}</Ic></a>
+      <a className="soc" href={SOCIAL.fb} target="_blank" rel="noopener noreferrer" aria-label="Facebook"><Ic>{FB}</Ic></a>
+    </div>
+  );
+}
+
+function Nav({ page }) {
+  const [m, setM] = useState(false), [sc, setSc] = useState(false);
+  useEffect(() => { setM(false); }, [page]);
+  useEffect(() => {
+    const f = () => setSc(window.scrollY > 40);
+    f();
+    window.addEventListener("scroll", f, { passive: true });
+    return () => window.removeEventListener("scroll", f);
+  }, []);
+  const go = (id) => (e) => { setM(false); jump(id)(e); };
+  return (
+    <nav className={sc ? "sc" : ""}>
+      <div className="wrap navgrid">
+        <div className="navl">
+          {page === "h" ? <>
+            <a className="navlink on" href="#/">Начало</a>
+            <a className="navlink" href="#uslugi" onClick={jump("uslugi")}>Услуги</a>
+            <a className="navlink" href="#raboti" onClick={jump("raboti")}>Работи</a>
+          </> : <a className="navlink on" href="#/">← Начало</a>}
+          <a className="navcall" href="tel:0887378844" aria-label="Позвъни"><Ic>{PH}</Ic></a>
+        </div>
+        <div className="navr">
+          <a className="navlink" href="#/kontakti">Контакти</a>
+          <Social />
+          <a className="navbtn" href="tel:0887378844"><Ic>{PH}</Ic>0887 378 844</a>
+          <button type="button" className="burger" aria-label="Меню" aria-expanded={m} onClick={() => setM(!m)}><span /><span /><span /></button>
+        </div>
       </div>
       <a className="badge" href="#/" aria-label="MKeysPlovdiv - начало">
         <img src={LOGO_IMG} alt="MKeysPlovdiv" />
       </a>
-      <div className="navr">
-        <a className="navlink" href="#/kontakti">Контакти</a>
-        <a className="navbtn" href="tel:0887378844"><Ic>{PH}</Ic>0887 378 844</a>
-      </div>
-    </div></nav>
+      {m && (
+        <div className="menu">
+          <a href="#/" onClick={() => setM(false)}>Начало</a>
+          {page === "h" && <>
+            <a href="#uslugi" onClick={go("uslugi")}>Услуги</a>
+            <a href="#raboti" onClick={go("raboti")}>Работи</a>
+          </>}
+          <a href="#/kontakti" onClick={() => setM(false)}>Контакти</a>
+          <a href="tel:0887378844">0887 378 844</a>
+          <Social />
+        </div>
+      )}
+    </nav>
   );
 }
 
@@ -132,6 +171,7 @@ function Home({ items }) {
             <a className="btn p" href="tel:0887378844">Позвъни</a>
             <a className="btn g" href="#raboti" onClick={jump("raboti")}>Виж работите</a>
           </div>
+          <Social />
         </div>
       </header>
 
@@ -157,10 +197,11 @@ function Home({ items }) {
       <div className="cband"><div className="wrap">
         <div>
           <h2>Имаш въпрос?</h2>
-          <p className="sub">Обади се или пиши на имейл.</p>
+          <p className="sub">Обади се или пиши на имейл, в Instagram или Facebook.</p>
         </div>
         <div className="cb-r">
           <a className="cb-tel" href="tel:0887378844">0887 378 844</a>
+          <Social />
           <a className="btn g" href="#/kontakti">Всички контакти</a>
         </div>
       </div></div>
@@ -181,6 +222,8 @@ function Contacts() {
         <li><span>Телефон</span><a href="tel:0887378844">0887 378 844</a></li>
         <li><span>Имейл</span><a href="mailto:n.petrov1905@gmail.com">n.petrov1905@gmail.com</a></li>
         <li><span>Град</span><b>гр. Пловдив</b></li>
+        <li><span>Instagram</span><a href={SOCIAL.ig} target="_blank" rel="noopener noreferrer">Instagram ↗</a></li>
+        <li><span>Facebook</span><a href={SOCIAL.fb} target="_blank" rel="noopener noreferrer">Facebook ↗</a></li>
       </ul></div></section>
     </>
   );
@@ -225,7 +268,7 @@ function Admin({ user, items }) {
     setBusy(false);
   };
   return (
-    <section><div className="wrap">
+    <section className="adm"><div className="wrap">
       {!user ? (
         <div className="md">
           <h3>Вход</h3>
