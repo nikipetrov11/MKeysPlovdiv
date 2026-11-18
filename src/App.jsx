@@ -4,6 +4,7 @@ import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebas
 import { db, auth } from "./firebase.js";
 import { RABOTI } from "./raboti.js";
 import { LOGO_IMG, HERO_IMG } from "./assets.js";
+import { Analytics } from "@vercel/analytics/react";
 import "./styles.css";
 
 const IC = { "Ключове": "🔑", "Кодиране": "⚙️", "Програмиране": "💻" };
@@ -316,6 +317,7 @@ export default function App() {
       {page === "k" && <Contacts />}
       {page === "a" && <Admin user={user} items={items} />}
       <footer>© 2026 MKeysPlovdiv · Лично портфолио{page === "h" ? ", без платени услуги. Всичко е направено със съгласието на собственика на автомобила." : "."}</footer>
+      <Analytics />
     </>
   );
 }
